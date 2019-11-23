@@ -1,3 +1,4 @@
+// Require file system library
 const fs = require("fs");
 
 // Read file as text
@@ -7,29 +8,40 @@ function read_file(file_path: string): string {
 }
 
 function sell(bids: [number, number][], eth_ammount: number, acc = 0): number {
-  /* Destructuring bids tuple like that:
-      bids: [
-      [Array], [Array], [Array], [Array], [Array], [Array], [Array],
-      [Array], [Array], [Array], [Array], [Array], [Array], [Array],
-      [Array], [Array], [Array], [Array], [Array], [Array], [Array],
-      [Array], [Array], [Array], [Array], [Array], [Array], [Array],
-      [Array], [Array], [Array], [Array], [Array], [Array], [Array],
-      [Array], [Array], [Array], [Array], [Array], [Array], [Array],
-      [Array], [Array], [Array], [Array], [Array], [Array], [Array],
-      [Array], [Array], [Array], [Array], [Array], [Array], [Array],
-      [Array], [Array], [Array], [Array], [Array], [Array], [Array],
-      [Array], [Array], [Array], [Array], [Array], [Array], [Array],
-      [Array], [Array], [Array], [Array], [Array], [Array], [Array],
-      [Array], [Array], [Array], [Array], [Array], [Array], [Array],
-      [Array], [Array], [Array], [Array], [Array], [Array], [Array],
-      [Array], [Array], [Array], [Array], [Array], [Array], [Array],
-      [Array], [Array],
-      ... 15 more items
-    ],
-    => into:
-    head = bids[0] = [Array]
-    tail = the rest of bids
-  */
+  for (let each_transaction of bids) {
+    if (eth_ammount == 0) {
+      return acc;
+    } else {
+      if (eth_ammount > each_transaction[1]) {
+        acc = acc + each_transaction[1] * each_transaction[0];
+        eth_ammount = eth_ammount - each_transaction[1];
+      } else {
+        acc = acc + each_transaction[0] * eth_ammount;
+        eth_ammount = 0;
+      }
+    }
+  }
+}
+
+function buy(asks: [number, number][], usd_ammount: number, acc = 0): number {
+  for (let each_transaction of asks) {
+    if (usd_ammount == 0) {
+      return acc;
+    } else {
+      let max_available_ammount = usd_ammount / each_transaction[0];
+      if (max_available_ammount > each_transaction[1]) {
+        acc = acc + each_transaction[1];
+        usd_ammount = usd_ammount - each_transaction[0] * each_transaction[1];
+      } else {
+        acc = acc + max_available_ammount;
+        usd_ammount = 0;
+      }
+    }
+  }
+}
+/* Recusion from:
+
+function sell(bids: [number, number][], eth_ammount: number, acc = 0): number {
   let [head, ...tail] = bids;
   // Stop condition
   if (bids.length == 0 || eth_ammount <= 0) {
@@ -43,6 +55,7 @@ function sell(bids: [number, number][], eth_ammount: number, acc = 0): number {
     }
   }
 }
+
 
 function buy(asks: [number, number][], usd_ammount: number, acc = 0): number {
   let [head, ...tail] = asks;
@@ -61,6 +74,8 @@ function buy(asks: [number, number][], usd_ammount: number, acc = 0): number {
     }
   }
 }
+
+*/
 
 function calculateBuyingRate(
   file_path: string,
@@ -159,7 +174,7 @@ function calculateBuyingRate(
 }
   */
   let parsed_contain = JSON.parse(file_contain);
-  // Destructuring parsed objects
+  // Destructuring parsed object
   let {
     local: { bids: local_bids, asks: local_asks },
     remote: { bids: remote_bids, asks: remote_asks }
@@ -190,14 +205,10 @@ function calculateSellingRate(
   return [selling_rate_local, selling_rate_remote];
 }
 
-/*
 // Testing calculateSellingRate => result = [ 3358.6000000000004, 3358.6171200000003 ]
 let test = calculateSellingRate("test.json", 20);
 console.log(test);
-*/
 
-/*
 // Testing calculateBuyingRate => result = [ 5.95335181558426, 5.952742369188642 ]
-let test = calculateBuyingRate("test.json", 1000);
-console.log(test);
-*/
+let test2 = calculateBuyingRate("test.json", 1000);
+console.log(test2);
