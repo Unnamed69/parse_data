@@ -205,10 +205,14 @@ function calculateSellingRate(
   return [selling_rate_local, selling_rate_remote];
 }
 
+/*
 // Testing calculateSellingRate => result = [ 3358.6000000000004, 3358.6171200000003 ]
 let test = calculateSellingRate("test.json", 20);
 console.log(test);
+*/
 
+/*
 // Testing calculateBuyingRate => result = [ 5.95335181558426, 5.952742369188642 ]
 let test2 = calculateBuyingRate("test.json", 1000);
 console.log(test2);
+*/
